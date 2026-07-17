@@ -10,8 +10,8 @@
 <a href="{% url 'create_book' %}">Create Book</a>
 
 <ul>
-    {% for book in books %}
-    <li>{{ book.title }} - {{ book.author }}</li>
+    {% for b in books %}
+    <li>{{ b.title }} - {{ b.author }} <a href="{% url 'delete_book' b.pk %}"> 🗑️ </a></li>
 
     {% endfor %}
 </ul>
