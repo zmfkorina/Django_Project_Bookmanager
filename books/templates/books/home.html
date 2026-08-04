@@ -26,6 +26,7 @@
 <ul>
     {% for b in books %}
     <li>{{ b.title }} - {{ b.author }}
+        <a href="{% url 'list_user_books' b.user.pk %}"> {{ b.user.username }}</a>
         <a href="{% url 'delete_book' b.pk %}"> 🗑️ </a>
         <a href="{% url 'update_book' b.pk %}"> 📝️ </a>
     </li>
