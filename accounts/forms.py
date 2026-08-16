@@ -6,6 +6,5 @@ User = get_user_model()
 
 class RegisterForm(UserCreationForm):
     class Meta:
-        model = User
-        # now points to CustomUser
+        model = User                                 # now points to CustomUser
         fields = ("username", "email", "password1", "password2")

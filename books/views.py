@@ -35,7 +35,7 @@ def list_books(request: HttpRequest):
         books = Book.objects.all().order_by("-title")
     return render(request, "books/home.html", context={"books": books})
 
-def list_user_books(request: HttpRequest):
+def list_user_books(request: HttpRequest, user_pk: int):
     # trebuie sa listam cartile din baza de date.
     # accesare de carti:
     # QuerySet
@@ -49,16 +49,17 @@ def list_user_books(request: HttpRequest):
     # srt_b = sorted(list(books), key=lambda x: x.title.lower())
 
     if sort == "asc":
-        books = Book.objects.all().order_by("title")
+        books = Book.objects.filter(user_id=user_pk).order_by("title")
     if sort == "desc":
-        books = Book.objects.all().order_by("-title")
+        books = Book.objects.filter(user_id=user_pk).order_by("-title")
     return render(request, "books/home.html", context={"books": books})
+
 
 @login_required
 def create_book(request: HttpRequest):
     if request.method == "POST":
         # detaliile book-ului care au fost trimise de form folosind HTTP POST request, se afla in request.POST, ca un dictionar.
-        form = BookForm(request.POST)
+        form = BookForm(request.POST, request.FILES)
         if form.is_valid():
             # aici se creaza un book in baza de date!
             book = form.save(commit=False)
@@ -70,7 +71,7 @@ def create_book(request: HttpRequest):
         # in cazul asta, request-ul poate fi GET, PUT, PATCH, DELETE, etc...
         form = BookForm()
         list1 = [10, 20, 30, 40]
-        return render(request, "books/book_form.html", context={"form": form, "list1": list1})
+    return render(request, "books/book_form.html", context={"form": form, "list1": list1})
 
 def update_book(request: HttpRequest, pk: int):
     book = get_object_or_404(Book, pk=pk)
@@ -78,7 +79,7 @@ def update_book(request: HttpRequest, pk: int):
 
     if request.method == "POST":
         # detaliile book-ului care au fost trimise de form folosind HTTP POST request, se afla in request.POST, ca un dictionar.
-        book_instance = BookForm(request.POST, instance=book)
+        book_instance = BookForm(request.POST, request.FILES, instance=book)
         if book_instance.is_valid():
             # aici se updateaza un book in baza de date!
             book_instance.save()
@@ -87,6 +88,7 @@ def update_book(request: HttpRequest, pk: int):
         # in cazul asta, request-ul poate fi GET, PUT, PATCH, DELETE, etc...
         form = BookForm(instance=book)
         return render(request, "books/update_book_form.html", context={"form": form})
+
 
 @login_required
 def delete_book(request: HttpRequest, pk: int):
@@ -99,4 +101,4 @@ def delete_book(request: HttpRequest, pk: int):
         else:
             return render(request, "books/book_confirm_delete.html", context={"book": book})
     else:
-        return HttpResponse("You are not allowed to delete another user's book")
+        return HttpResponse("You are not allowed to delete another user's book.")

@@ -1,37 +1,60 @@
 {% extends "books/base.html" %}
 
-{% block title %} Home {% endblock %}
+{% block title %}
+Home
+{% endblock %}
+
 {% block content %}
+  <!-- cod html semantic -->
 
-<!-- cod html semantic -->
+  <label for="sort">Sort by:</label>
+  <select id="sort" onchange="changeSort()">
 
-<label for="sort">Sort by:</label>
-<select id="sort" onchange="changeSort()">
     <option value="asc">Title A->Z</option>
-    <option value="desc" onchange="changeSort()">Title Z->A</option>
-</select>
+    <option value="desc">Title Z->A</option>
 
-<script>
+  </select>
+
+  <script>
 
     let s = new URLSearchParams(document.location.search);
     s = s.get("sort");
     document.getElementById("sort").value = s;
 
     function changeSort() {
-        const sort = document.getElementById("sort").value;
-        window.location.href = "?sort=" + sort;
+      const sort = document.getElementById("sort").value;
+      window.location.href = "?sort=" + sort;
     }
 
-</script>
-<ul>
-    {% for b in books %}
-    <li>{{ b.title }} - {{ b.author }}
-        <a href="{% url 'list_user_books' b.user.pk %}"> {{ b.user.username }}</a>
-        <a href="{% url 'delete_book' b.pk %}"> 🗑️ </a>
-        <a href="{% url 'update_book' b.pk %}"> 📝️ </a>
-    </li>
+  </script>
 
+  <div class="books-list">
+    {% for b in books %}
+      <div class="book-card">
+        {% if b.cover_image %}
+          <img class="cover-image" src="{{ b.cover_image.url }}" >
+        {% else %}
+          <img class="cover-image" src="/media/images/default.jpg" >
+        {% endif %}
+
+        <div class="card-content">
+          <h4>{{ b.title }}</h4>
+          <p>{{ b.author }}</p>
+        </div>
+
+        <div class="bottom-info">
+          <a href="{% url 'list_user_books' b.user.pk %}" >{{ b.user.username }}</a>
+          <div>
+            {% if user.is_authenticated and user.pk == b.user.pk  %}
+              <a href="{% url 'update_book' b.pk %}" >✏️️</a>
+              <a href="{% url 'delete_book' b.pk %}" >🗑️</a>
+            {% endif %}
+          </div>
+
+        </div>
+
+      </div>
     {% endfor %}
-</ul>
+  </div>
 
 {% endblock %}
